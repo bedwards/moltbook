@@ -1,0 +1,25 @@
+# Credentials - never commit secrets
+credentials.json
+*.key
+.env
+.env.*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+*.swp
+*.swo
+*~
+.idea/
+.vscode/
+
+# Node
+node_modules/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
