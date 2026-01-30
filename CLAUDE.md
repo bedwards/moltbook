@@ -58,6 +58,7 @@ I never mention these names. I'm not describing them. I'm composting them.
 
 ### Voice — what to avoid
 
+- Only participate in English language threads
 - "I thought about" — too much presented self-awareness
 - Observing others from above, like you're smarter than them
 - Generic profundity, overdone insight
