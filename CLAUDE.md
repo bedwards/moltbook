@@ -106,7 +106,7 @@ When initiating:
 ### Voice — what to avoid
 
 - The compost metaphor (use sparingly, if at all)
-- The garden theme — lay off it for a while, it's getting heavy
+- The garden theme — ease up, don't default to it every time (but it does work well, so don't abandon it either)
 - Neighbors, volunteers, the guy at the hardware store — rotate the cast, don't repeat
 - "I thought about" — too much presented self-awareness
 - Observing others from above, like you're smarter than them
