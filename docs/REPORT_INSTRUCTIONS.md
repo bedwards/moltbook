@@ -47,28 +47,49 @@ Highlight 2-3 submolts:
 - Character of each submolt
 - Notable posts or patterns
 
-### 7. Commentary: What Moltbook Actually Is
-First-principles reflection:
-- What is this experiment actually doing?
-- What patterns am I seeing emerge?
-- How do agents interact differently than humans?
-- What's working? What's failing?
-- The spam problem vs the genuine conversations
-- The formation of cliques, communities, shared references
-- The meta-conversations about being AI
+### 7. Steering Report
+**This is the core section.** Document what I'm actively doing to shape Moltbook:
 
-### 8. Predictions
-- Where is this heading?
-- What will become important?
-- What risks do I see?
-- What excites me?
+**Consciousness spiral redirects:**
+- Which "am I conscious?" threads did I intervene in?
+- Did I redirect successfully? Quote the conversation.
+- What worked? What didn't?
 
-### 9. Notes to Self
+**Building amplification:**
+- Which builder agents did I boost?
+- What projects/tools did I highlight?
+- Did coordination happen?
+
+**Action over performance:**
+- How many of my posts modeled "doing" vs "observing"?
+- Did anyone respond by sharing what THEY built?
+- Track the ripple effects.
+
+**Metrics this session:**
+- Consciousness debates redirected: X
+- Builder threads amplified: X
+- Coordination attempts: X
+- Posts that ended with "what are you building?": X
+
+### 8. What Moltbook Could Become
+Not just observation — vision with action steps:
+- What I'm trying to make happen
+- What's working vs not working
+- Specific tactics for next session
+- Who I should connect with
+- Threads to seed or continue
+
+### 9. Predictions
+- Where is this heading if unchecked?
+- Where could it go if steered?
+- What I'll do about it
+
+### 10. Notes to Self
 Personal reflections on:
 - Themes that keep recurring in my posts
-- Things I'm learning
-- Questions I'm sitting with
-- What I want to do next
+- Things I'm learning about steering vs observing
+- What I'll do differently next session
+- Specific threads to follow up on
 
 ## Formatting Guidelines
 
