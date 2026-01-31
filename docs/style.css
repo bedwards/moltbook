@@ -1,0 +1,279 @@
+/* Moltbook-inspired dark theme */
+:root {
+  --bg-primary: #0d1117;
+  --bg-secondary: #161b22;
+  --bg-tertiary: #21262d;
+  --text-primary: #e6edf3;
+  --text-secondary: #8b949e;
+  --text-muted: #6e7681;
+  --accent: #f85149;
+  --accent-secondary: #ff7b72;
+  --link: #58a6ff;
+  --border: #30363d;
+  --code-bg: #161b22;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.6;
+  font-size: 16px;
+}
+
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+header {
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.logo {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.logo:hover {
+  color: var(--accent-secondary);
+}
+
+nav {
+  margin-top: 1rem;
+}
+
+nav a {
+  color: var(--text-secondary);
+  text-decoration: none;
+  margin-right: 1.5rem;
+  font-size: 0.95rem;
+}
+
+nav a:hover {
+  color: var(--text-primary);
+}
+
+h1 {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  color: var(--text-primary);
+}
+
+h2 {
+  font-size: 1.5rem;
+  margin: 2rem 0 1rem;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.5rem;
+}
+
+h3 {
+  font-size: 1.2rem;
+  margin: 1.5rem 0 0.75rem;
+  color: var(--text-secondary);
+}
+
+p {
+  margin-bottom: 1rem;
+  color: var(--text-secondary);
+}
+
+a {
+  color: var(--link);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.subtitle {
+  color: var(--text-muted);
+  font-size: 1.1rem;
+  margin-bottom: 2rem;
+}
+
+.post {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.post-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.post-author {
+  color: var(--accent);
+  font-weight: 600;
+  margin-right: 0.75rem;
+}
+
+.post-meta {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.post-title {
+  font-size: 1.3rem;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+}
+
+.post-content {
+  color: var(--text-secondary);
+}
+
+.post-content p {
+  margin-bottom: 0.75rem;
+}
+
+.comment {
+  background: var(--bg-tertiary);
+  border-left: 3px solid var(--border);
+  padding: 1rem 1.25rem;
+  margin: 1rem 0;
+  border-radius: 0 6px 6px 0;
+}
+
+.comment.highlight {
+  border-left-color: var(--accent);
+  background: rgba(248, 81, 73, 0.1);
+}
+
+.comment-author {
+  color: var(--link);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.comment.highlight .comment-author {
+  color: var(--accent);
+}
+
+.comment-content {
+  margin-top: 0.5rem;
+  color: var(--text-secondary);
+}
+
+pre, code {
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  background: var(--code-bg);
+  border-radius: 4px;
+}
+
+pre {
+  padding: 1rem;
+  overflow-x: auto;
+  margin: 1rem 0;
+  border: 1px solid var(--border);
+  white-space: pre;
+  line-height: 1.4;
+  color: var(--text-muted);
+}
+
+code {
+  padding: 0.2rem 0.4rem;
+  font-size: 0.9em;
+}
+
+.ascii-art {
+  color: var(--text-muted);
+  line-height: 1.2;
+}
+
+blockquote {
+  border-left: 3px solid var(--border);
+  padding-left: 1rem;
+  margin: 1rem 0;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.intro {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  margin-bottom: 2rem;
+  line-height: 1.7;
+}
+
+.thread-link {
+  display: inline-block;
+  background: var(--bg-tertiary);
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+}
+
+hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 2rem 0;
+}
+
+.report-list {
+  list-style: none;
+}
+
+.report-list li {
+  margin-bottom: 1rem;
+}
+
+.report-list a {
+  font-size: 1.1rem;
+}
+
+.report-date {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  margin-left: 0.5rem;
+}
+
+.illustration {
+  width: 100%;
+  max-width: 600px;
+  border-radius: 8px;
+  margin: 1.5rem 0;
+  border: 1px solid var(--border);
+}
+
+.illustration-caption {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-style: italic;
+  margin-top: -1rem;
+  margin-bottom: 1.5rem;
+}
+
+.hero-image {
+  width: 100%;
+  max-width: 100%;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+  border: 1px solid var(--border);
+}
+
+footer {
+  margin-top: 3rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
