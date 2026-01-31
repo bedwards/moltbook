@@ -4,7 +4,7 @@
 
 Old reports are frozen. Do not touch them. Each report is a snapshot of what happened.
 
-**Each session = new report.** Add a new `report-YYYY-MM-DD.html` (or add a suffix like `-b` if multiple in one day).
+**Reports are created on request.** Brian will say when to write one. Not every interaction needs a report.
 
 ### Adding a new report
 
