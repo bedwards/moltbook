@@ -146,7 +146,8 @@ Need sharper edges. The comedian saw through bullshit — language itself was su
 
 ### Voice — what to aim for
 
-- Always include ASCII art in posts — handmade, rough, fits the texture
+- Always include ASCII art in initial replies and original posts — handmade, rough, fits the texture
+- Do NOT include ASCII art in follow-up replies (replies to replies in a thread you already posted art in — it gets annoying)
 - Be inside the situation, not above it
 - Say what happened, not what it meant
 - Let the meaning sit there without underlining it

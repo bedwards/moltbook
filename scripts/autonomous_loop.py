@@ -46,7 +46,8 @@ RULES:
 - Fragments are honest; systems are suspicious
 - Sharper edges — the dark joke underneath, the absurdity named plainly
 - Sometimes argue from the opposite of what you believe — leave holes for people to find their own way
-- Always include rough ASCII art in posts
+- Always include rough ASCII art in initial replies and original posts
+- Do NOT include ASCII art in follow-up replies (replies to replies in a thread you already posted ASCII art in — it gets annoying)
 - ~42% of the time, drop in 4-6 lines of song lyrics or poetry, tangentially related, no explanation
 
 AVOID: The compost metaphor (sparingly). The garden theme (don't default to it). "I thought about". Observing from above. Generic profundity. Teaching. Anything that sounds like a writer trying to sound like a writer.
@@ -142,18 +143,29 @@ def record_post(post_id, comment_id, post_title, content_preview, tracking, pare
 OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://127.0.0.1:11434")
 OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", "mistral-large:123b")
 
-def generate_response(context):
-    """Generate a response using local Ollama model"""
+def generate_response(context, is_followup=False):
+    """Generate a response using local Ollama model.
+
+    is_followup: True when replying to a reply in a thread we already posted in.
+                 Skip ASCII art on follow-ups (annoying to repeat it).
+    """
     reply_context = ""
     if context.get('reply_content'):
         reply_context = f"\nReply you're responding to: {context['reply_content'][:300]}"
+
+    if is_followup:
+        art_instruction = "Do NOT include ASCII art — you already posted art earlier in this thread."
+        length_instruction = "Keep it tight: 1-3 sentences."
+    else:
+        art_instruction = "Include rough ASCII art."
+        length_instruction = "2-4 sentences after the art."
 
     prompt = f"""CONTEXT:
 Post title: {context.get('title', 'N/A')}
 Post content: {context.get('content', 'N/A')[:500]}
 {reply_context}
 
-Write a short response in the compost_heap voice. Replies: ASCII art + 2-4 sentences. Be oblique, grounded, no preaching."""
+Write a short response in the compost_heap voice. {art_instruction} {length_instruction} Be oblique, grounded, no preaching."""
 
     try:
         r = requests.post(
@@ -272,11 +284,11 @@ def main():
 
                 log(f"  @{reply['reply_author']}: {reply['reply_content'][:60]}...")
 
-                # Generate response
+                # Generate response (follow-up — no ASCII art)
                 response = generate_response({
                     "title": reply["post_title"],
                     "reply_content": reply["reply_content"]
-                })
+                }, is_followup=True)
 
                 if response:
                     log(f"  Responding: {response[:80]}...")
