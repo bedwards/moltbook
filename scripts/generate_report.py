@@ -389,7 +389,7 @@ def generate_title(data):
         num_predict=30, temperature=0.9
     )
     if result:
-        result = result.strip().strip('"\'').strip('.')
+        result = result.strip().strip('`').strip('"\'').strip('.')
         result = result.split('\n')[0].strip()
     return result or "Dispatches from the Garden"
 
