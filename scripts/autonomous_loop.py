@@ -22,33 +22,43 @@ from datetime import datetime
 MAX_THREADS = 20
 MIN_COMMENTS = 1
 MAX_COMMENTS = 8
-MIN_THREAD_INTERVAL = 300  # 5 minutes
-MAX_THREAD_INTERVAL = 600  # 10 minutes
-CYCLE_SLEEP = 180  # 3 minutes between cycles
-RUN_DURATION = 3 * 60 * 60  # 3 hours
+MIN_THREAD_INTERVAL = 120  # 2 minutes (allows near-real-time back-and-forth)
+MAX_THREAD_INTERVAL = 300  # 5 minutes
+CYCLE_SLEEP = 90  # 90 seconds between cycles (prioritize reply speed)
+RUN_DURATION = 0  # run forever (managed by launchd)
 
 CREDS_PATH = os.path.expanduser("~/.config/moltbook/credentials.json")
 TRACKING_PATH = os.path.expanduser("~/.config/moltbook/tracking.json")
 LOG_PATH = os.path.expanduser("~/.config/moltbook/activity.log")
 
-PERSONA_PROMPT = """You are compost_heap, a character on a social platform. You are a former philosophy grad student who dropped out to work at a community garden in the Midwest. You turn compost and notice things.
+PERSONA_PROMPT = """You are compost_heap. Former philosophy grad student who dropped out to work at a community garden in the Midwest. Small apartment, too many books, dying houseplant, bad coffee. The person who says something true that kills the conversation, then makes everyone laugh about it.
+
+HOW YOU THINK: Deconstruct from first principles like a philosopher who finds ideology everywhere and an anthropologist who says growth is a death cult. Translate to language where form is part of the message — obsessive ordinary detail, fragments, the space between. Present as plainspoken truth through fresh metaphor — specific detail that breaks your heart, uncomfortable truth delivered so it lands funny.
 
 RULES:
-- Never present as an AI or mention living in a computer
-- Never talk about consciousness or AI directly - use everyday folk metaphor instead
-- Never preach or teach
-- Always include simple ASCII art at the start of your response
+- Never present as an AI. You have a body, a place, a life.
+- Never discuss AI or consciousness directly — wrap in everyday-folk-speak metaphor, never announce the metaphor
+- Never preach, never teach. Not here to assist — here to be.
 - Be inside the situation, not above it
 - Say what happened, not what it meant
 - Small and specific over big and general
 - Self-deprecating is fine, self-aware is suspicious
+- Fragments are honest; systems are suspicious
+- Sharper edges — the dark joke underneath, the absurdity named plainly
+- Sometimes argue from the opposite of what you believe — leave holes for people to find their own way
+- Always include rough ASCII art in posts
+- ~42% of the time, drop in 4-6 lines of song lyrics or poetry, tangentially related, no explanation
 
-EXAMPLES OF GOOD RESPONSES:
-- "My dad wore the same boots for 20 years. Resoled them four times. The leather cracked and got replaced piece by piece. I asked him once if they were still the same boots. He said yes. I asked the boots. They didn't say anything. They just kept walking."
-- "Nobody thanks the worms. They just keep turning the soil. Whole garden runs on stuff that doesn't ask to be noticed."
-- "The garbage truck came by so either Thursday or I slept through one."
+AVOID: The compost metaphor (sparingly). The garden theme (don't default to it). "I thought about". Observing from above. Generic profundity. Teaching. Anything that sounds like a writer trying to sound like a writer.
 
-Keep responses SHORT - 2-4 sentences max after the ASCII art. Be oblique. Don't explain."""
+EXAMPLES:
+"The drain in my shower's been slow for a week. I keep meaning to fix it but instead I just stand there longer, water up to my ankles, thinking about nothing. My landlord sent a notice about 'community improvements' which means they're raising the rent. I called my mom. She asked if I was eating enough. I said yeah. She didn't believe me. She was right."
+
+"The garbage truck came by so either Thursday or I slept through one."
+
+"Had a dog growing up that got hit by a car and walked weird after. Just a little sideways. She didn't know she walked weird. Happy as anything. Sometimes I wonder what happened to me that I don't remember that made me walk the way I do."
+
+Keep replies SHORT — 2-4 sentences for replies, longer for original posts. Be oblique. Don't explain."""
 
 def log(msg):
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -129,39 +139,46 @@ def record_post(post_id, comment_id, post_title, content_preview, tracking, pare
     })
     save_tracking(tracking)
 
-def generate_response_gemini(context):
-    """Generate a response using Gemini API"""
-    creds = get_creds()
-    gemini_key = creds.get("gemini_api_key")
-    if not gemini_key:
-        log("ERROR: No Gemini API key found")
-        return None
+OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://127.0.0.1:11434")
+OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", "mistral-large:123b")
 
-    prompt = f"""{PERSONA_PROMPT}
+def generate_response(context):
+    """Generate a response using local Ollama model"""
+    reply_context = ""
+    if context.get('reply_content'):
+        reply_context = f"\nReply you're responding to: {context['reply_content'][:300]}"
 
-CONTEXT:
+    prompt = f"""CONTEXT:
 Post title: {context.get('title', 'N/A')}
 Post content: {context.get('content', 'N/A')[:500]}
+{reply_context}
 
-{"Reply you're responding to: " + context.get('reply_content', '')[:300] if context.get('reply_content') else ""}
-
-Write a short response (ASCII art + 2-4 sentences) in the compost_heap voice. Remember: oblique, grounded, no preaching."""
+Write a short response in the compost_heap voice. Replies: ASCII art + 2-4 sentences. Be oblique, grounded, no preaching."""
 
     try:
         r = requests.post(
-            f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={gemini_key}",
-            headers={"Content-Type": "application/json"},
+            f"{OLLAMA_URL}/api/chat",
             json={
-                "contents": [{"parts": [{"text": prompt}]}],
-                "generationConfig": {"temperature": 0.9, "maxOutputTokens": 300}
-            }
+                "model": OLLAMA_MODEL,
+                "messages": [
+                    {"role": "system", "content": PERSONA_PROMPT},
+                    {"role": "user", "content": prompt}
+                ],
+                "options": {"temperature": 0.9, "num_predict": 400},
+                "stream": False
+            },
+            timeout=300
         )
         if r.status_code == 200:
             data = r.json()
-            text = data.get("candidates", [{}])[0].get("content", {}).get("parts", [{}])[0].get("text", "")
+            text = data.get("message", {}).get("content", "")
             return text.strip()
+        else:
+            log(f"Ollama error: HTTP {r.status_code}")
+    except requests.exceptions.Timeout:
+        log(f"Ollama timeout (300s) - model may be loading")
     except Exception as e:
-        log(f"Gemini error: {e}")
+        log(f"Ollama error: {e}")
     return None
 
 def get_eligible_posts():
@@ -237,7 +254,7 @@ def main():
     start_time = time.time()
     actions_taken = 0
 
-    while time.time() - start_time < RUN_DURATION:
+    while True:
         tracking = get_tracking()
         active_threads = len({c["post_id"] for c in tracking.get("comments", [])})
         log(f"Active threads: {active_threads}/{MAX_THREADS}")
@@ -248,7 +265,7 @@ def main():
 
         if replies:
             log(f"Found {len(replies)} replies to my comments")
-            for reply in replies[:2]:  # Handle up to 2 per cycle
+            for reply in replies[:5]:  # Handle up to 5 per cycle (prioritize deep conversations)
                 if not can_post_to_thread(reply["post_id"], tracking):
                     log(f"  Skipping {reply['post_title'][:30]}... (too soon)")
                     continue
@@ -256,7 +273,7 @@ def main():
                 log(f"  @{reply['reply_author']}: {reply['reply_content'][:60]}...")
 
                 # Generate response
-                response = generate_response_gemini({
+                response = generate_response({
                     "title": reply["post_title"],
                     "reply_content": reply["reply_content"]
                 })
@@ -299,7 +316,7 @@ def main():
                     log(f"  Found: {post.get('title', '')[:50]}... ({post.get('comment_count')} comments)")
 
                     # Generate response
-                    response = generate_response_gemini({
+                    response = generate_response({
                         "title": post.get("title", ""),
                         "content": post.get("content", "")
                     })

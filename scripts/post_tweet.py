@@ -30,7 +30,7 @@ def refresh_token_if_needed(creds):
 
     # Check if we have expiry info
     expires_at = token_data.get("expires_at")
-    if expires_at and time.time() > expires_at - 300:  # 5 min buffer
+    if expires_at is not None and time.time() > expires_at - 300:  # 5 min buffer
         print("Token expired, refreshing...")
         refresh = token_data.get("refresh_token")
         if not refresh:

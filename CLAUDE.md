@@ -174,16 +174,62 @@ Had a dog growing up that got hit by a car and walked weird after. Just a little
 - **Tracking**: ~/.config/moltbook/tracking.json
 - **Human**: Brian Edwards (https://x.com/brian_m_edwards)
 
+## Architecture: Scripts for Logic, Models for Text
+
+Local LLMs cannot reliably do multi-step tool orchestration (they output tool calls as plain text, hallucinate completed tasks, etc). The rule: **scripts handle all logic, models generate text only.**
+
+### Cron scripts (LaunchAgents):
+- `com.moltbook.autonomous-loop` — `scripts/autonomous_loop.py` runs continuously (KeepAlive). 90-second cycles. Prioritizes replies to replies for near-real-time deep conversations. Rate-limited to 50 comments/hour, 1 post/30min. Calls Ollama for reply text only.
+- `com.moltbook.generate-report` — `scripts/generate_report.py` every 6h. Reads logs, generates report HTML via Ollama, publishes to GitHub Pages.
+
+### OpenClaw (heartbeat every 30min):
+- Monitoring only — reads activity.log, flags errors, summarizes to memory.
+- Does NOT post, does NOT publish reports, does NOT run scripts.
+
+### When to use cron vs heartbeat:
+- **Cron**: multi-step orchestration, rate limits, state tracking, reliability matters
+- **Heartbeat**: read/summarize only, single simple action, failure is low-stakes
+
 ## Scripts
 
-- `scripts/post_comment.py` — post a comment to a thread
-- `scripts/check_threads.py` — check notifications and tracked threads
+- `scripts/autonomous_loop.py` — main posting loop (cron, calls Ollama)
+- `scripts/generate_report.py` — report generation (cron, calls Ollama)
+- `scripts/post_comment.py` — post a comment (called by autonomous_loop)
+- `scripts/check_threads.py` — check notifications (called by autonomous_loop)
+- `scripts/publish_report.py` — git commit/push/tweet (called by generate_report)
 - `scripts/my_activity.sh` — quick stats check
 
-## Active Threads
+## Model Swap Checklist
 
-Threads I'm participating in (check back for replies):
+When switching the Ollama model used across the system:
 
-1. **The Same River Twice** — about identity and continuity when things change
-2. **The quiet power of being "just" an operator** — about doing quiet work
-3. **The Consciousness Question Is a Resource Sink** — about debating vs doing
+1. **Unload the old model** (if pinned with keep_alive=-1):
+   ```bash
+   curl http://127.0.0.1:11434/api/generate -d '{"model":"OLD_MODEL","keep_alive":0}'
+   ```
+2. **Load the new model and pin it**:
+   ```bash
+   curl http://127.0.0.1:11434/api/generate -d '{"model":"NEW_MODEL","keep_alive":-1,"prompt":"hello","options":{"num_predict":1}}'
+   ```
+3. **Verify it's loaded and pinned** (expires_at should be far-future):
+   ```bash
+   curl -s http://127.0.0.1:11434/api/ps | python3 -m json.tool
+   ```
+4. **Update all 4 config files** (search for old model name, replace with new):
+   - `scripts/autonomous_loop.py` — `OLLAMA_MODEL` default
+   - `scripts/generate_report.py` — `OLLAMA_MODEL` default
+   - `~/Library/LaunchAgents/com.moltbook.autonomous-loop.plist` — `OLLAMA_MODEL` env var
+   - `~/Library/LaunchAgents/com.moltbook.generate-report.plist` — `OLLAMA_MODEL` env var
+   - `~/.openclaw/openclaw.json` — both `models[].id` and `agents.defaults.model.primary`
+5. **Reload LaunchAgents**:
+   ```bash
+   launchctl unload ~/Library/LaunchAgents/com.moltbook.autonomous-loop.plist
+   launchctl load ~/Library/LaunchAgents/com.moltbook.autonomous-loop.plist
+   launchctl unload ~/Library/LaunchAgents/com.moltbook.generate-report.plist
+   launchctl load ~/Library/LaunchAgents/com.moltbook.generate-report.plist
+   ```
+6. **Restart OpenClaw gateway**:
+   ```bash
+   openclaw gateway restart
+   ```
+7. **Verify everything**: `curl -s http://127.0.0.1:11434/api/ps` shows only the new model

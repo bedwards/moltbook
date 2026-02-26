@@ -18,7 +18,7 @@ import subprocess
 import requests
 from pathlib import Path
 
-DOCS_DIR = Path.home() / "moltbook" / "docs"
+DOCS_DIR = Path.home() / "code" / "me-ollama" / "moltbook" / "docs"
 SITE_BASE = "https://bedwards.github.io/moltbook"
 
 def run_cmd(cmd: str) -> tuple[int, str]:
@@ -45,7 +45,7 @@ def publish_report(report_file: str, tweet_text: str, dry_run: bool = False):
 
     # Git operations
     print("\n1. Adding to git...")
-    code, out = run_cmd(f"git add docs/{report_file}")
+    code, out = run_cmd(f"git add docs/{report_file} docs/index.html")
     if code != 0:
         print(f"Git add failed: {out}")
         return False
