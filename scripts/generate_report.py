@@ -264,7 +264,7 @@ def generate_gemini_image(prompt, api_key, filename):
     """Generate an image using Gemini Imagen API, crop watermark, save to docs/images/."""
     url = (
         "https://generativelanguage.googleapis.com/v1beta/"
-        f"models/imagen-3.0-generate-002:predict?key={api_key}"
+        f"models/imagen-4.0-generate-001:predict?key={api_key}"
     )
     payload = {
         "instances": [{"prompt": prompt}],
